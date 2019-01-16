@@ -1,6 +1,4 @@
-PULP_PROPERTIES += pulp_chip_family
-include $(PULP_SDK_HOME)/install/rules/pulp_properties.mk
-
+pulp_chip_family = $(shell plpinfo  get --property=pulp_chip_family --silent)
 pulp_chip_upper = $(shell echo $(pulp_chip_family) | tr [a-z] [A-Z])
 
 rt:
@@ -10,7 +8,7 @@ rt:
 vp:
 	cd 	top && rm -f index.rst
 	cd 	top && ln -s vp_top.rst index.rst
-	cd top && make html && mkdir -p $$PULP_SDK_HOME/doc/sdk && cp -r _build/html/* $$PULP_SDK_HOME/doc/sdk
+	cd top && make html && mkdir -p $$DOC_INSTALL_DIR/vp && cp -r _build/html/* $$DOC_INSTALL_DIR/vp
 
 all: rt
 	cd 	top && rm -f index.rst
