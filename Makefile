@@ -8,7 +8,7 @@ rt:
 vp:
 	cd 	top && rm -f index.rst
 	cd 	top && ln -s vp_top.rst index.rst
-	cd top && make html && mkdir -p $$DOC_INSTALL_DIR/vp && cp -r _build/html/* $$DOC_INSTALL_DIR/vp
+	cd top && export DOC_PROJECT="GVSOC" && make html && mkdir -p $$DOC_INSTALL_DIR/vp && cp -r _build/html/* $$DOC_INSTALL_DIR/vp
 
 all: rt
 	cd 	top && rm -f index.rst

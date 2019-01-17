@@ -1,4 +1,4 @@
-Pulp SDK documentation
+GVSOC documentation
 ===============================
 
 
@@ -8,7 +8,7 @@ Contents:
    :maxdepth: 2
 
    virtual_platform
-   configuration
+   periph_config
 
 
 Indices and tables
