@@ -74,6 +74,8 @@ This feature can be enabled and configured through the option *-\\-trace*. This 
 
   pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --trace=pe0/insn --trace=pe1/insn"
 
+It is also possible to get debug information about the binary being executed by adding the option *-\\-debug-syms**.
+
 The trace file should look like the following: ::
 
   194870000: 19487: [/sys/board/chip/soc/cluster/pe1/insn] M 1c001a96 c.li                a2, 0, 0           a2=00000000 
@@ -249,9 +251,9 @@ The devices to be simulated must be specified using the standard runner feature 
 Most usefull commands
 ---------------------
 
-For activating instruction traces: ::
+For activating instruction traces with debug symbols: ::
 
-  pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --trace=insn
+  pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --trace=insn --debug-syms
 
 For activating all traces: ::
 
