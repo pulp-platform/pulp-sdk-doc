@@ -74,8 +74,6 @@ This feature can be enabled and configured through the option *-\\-trace*. This 
 
   pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --trace=pe0/insn --trace=pe1/insn"
 
-It is also possible to get debug information about the binary being executed by adding the option *-\\-debug-syms**.
-
 The trace file should look like the following: ::
 
   194870000: 19487: [/sys/board/chip/soc/cluster/pe1/insn] M 1c001a96 c.li                a2, 0, 0           a2=00000000 
@@ -130,6 +128,24 @@ The latter information is using the following convention:
   - The order of the statements is following the order on the decoded instruction
 
 The memory accesses which are displayed are particularly interesting for tracking memory corruptions as they can be used to look for accesses to specific locations.
+
+
+Debug symbols
+-------------
+
+Some features like instruction traces can use debug symbols to display more information. To activate these features, first compile the binaries in debug mode so that debug symbols are present in the binaries. Then add the option *-\\-debug-syms* to *pulp-run*, like in the following example: ::
+
+  pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --trace=insn --debug-syms"
+
+The toolchain must be accessible for this option to work, either by making sure it is in accessible through environment variable PATH or by defining this environement variable: ::
+
+  export PULP_RISCV_GCC_TOOLCHAIN=<path containing bin/riscv32-unknown-elf-readelf>
+
+Once this works, the instruction trace should look like the following: ::
+
+  9398037447: 466538: [/sys/board/chip/soc/fc/insn                         ] _get_next_timeout_expiry:167     M 1c001d7c sw                  ra, 28(sp)         ra:1c002154  sp:1b000db0  PA:1b000dcc
+
+There is a new column which displays the debug information. There are 2 information separated by *:*, the first one is the function which this instruction belongs to, and the second is the line number of the instruction in the source code.
 
 
 VCD traces
