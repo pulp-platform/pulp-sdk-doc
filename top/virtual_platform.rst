@@ -144,30 +144,52 @@ VCD tracing can be activated through the following option: ::
 
   pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --event=.*
 
-Once the platform is run, this will generate a VCD file called *all.vcd* in the build folder.
+Once the platform is run, this will generate a VCD file called *all.vcd* in the build folder. This file a raw file containing all the signals value.
+
+Another file called *view.gtkw* is generated and can be opened using Gtkwave. This is a script file which will setup the view with the most interesting signals. The command to be executed is displayed at the beginning of the simulation when VCD traces are enabled.
+
+The default format is actually the FST gtkwave format, as it is much faster and smaller than VCD. The following option can be used to change the format to VCD: ::
+
+  pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --event=.* --event-format=vcd
 
 
 
 Display
 .......
 
-Any VCD viewer can be used to display the traces. On Linux the free gtkwave viewer can be used. For example to display the PC traces, you can launch it with: ::
+Any VCD viewer can be used to display the traces. On Linux the free Gtkwave viewer can be used. For example to display the PC traces, you can launch it with: ::
 
-  gtkwave <vcdFilePath>
+  gtkwave <vcd file path>
 
 Then click on Search->Search Signal Regexp, enter "pc", click on Select All and Insert, and close the box. You should now see the PC traces in the view, you can zoom out to see the full window.
 
-.. Gtkwave script generation
-.. .........................
+It is also possible to open the generated script file mentioned above with this command: ::
 
-.. In case gtkwave is used, a script can be automatically generated that will pre-configure all interesting signals. For that the following option must be used: ::
+  gtkwave <script path>
 
-..   $ make clean all run CONFIG_OPT="gvsoc/vcd/active gvsoc/vcd/gtkw"
 
-.. You should see at the beginning of the simulation that says that a script has been generated. Just open it with gtkwave and you should see all signals already configured in the view.
+View description
+................
 
-.. This view contains some pre-defined groups that are very useful for quickly opening and closing architectures parts. It also contains a group called debug, that contains more high-level debug information like function name, disassembled instructions and so on.
+The view displayed from the Gtkwave script is made of 2 parts.
 
+The first part, on the top (see the image below), is showing an overview of the execution with the most useful signals like the program counter of each core. This is useful to quickly check what is being executed in the whole system.
+
+.. image:: gtkwave2.png
+
+The second (see the image below), is showing a more detailed view of the execution. The program counter is shown again, with also debug information about the function being executed, the disassembled instructions and so on. For each core, a group called *events* contained information about the state of the core (stalls, loads, instructions, etc). This is useful to understand why a core is being stalled.
+
+
+.. image:: gtkwave1.png
+
+Interactive mode
+................
+
+In case the trace file becomes too big, it is possible to open gtkwave in interactive mode so that it is getting the traces in real time. For that launch the platform with this option: ::
+
+  pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --event=.* --gtkw
+
+This will automatically open Gtkwave and the traces are automatically updated.
 
 Application profiling
 ---------------------
