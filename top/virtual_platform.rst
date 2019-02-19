@@ -66,11 +66,14 @@ In both ways, refer to other sections to get the various properties which can be
 System traces
 -------------
 
+Description
+...........
+
 The virtual platform allows dumping architecture events to help developers debugging their applications by better showing what is happening in the system.
 
 For example, it can show instructions being executed, DMA transfers, events generated, memory accesses and so on.
 
-This feature can be enabled and configured through the option *-\\-trace*. This option takes an argument which specifies a regular expression of the path in the architecture where the traces must be enabled. All components whose path matches the specified one will dump traces. Several paths can be specified by using the option several times. Here is an example that activates instruction traces for core 0 and core 1: ::
+This feature can be enabled and configured through the option *-\\-trace*. This option takes an argument which specifies a regular expression of the path in the architecture where the traces must be enabled, and optionally a file where the traces should be dumped. All components whose path matches the specified one will dump traces. Several paths can be specified by using the option several times. Here is an example that activates instruction traces for core 0 and core 1: ::
 
   pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --trace=pe0/insn --trace=pe1/insn"
 
@@ -86,6 +89,9 @@ The number on the left gives the timestamp of the event, in picoseconds, and the
 The second part, which is a string, gives the path in the architecture where the event occurred. This is useful to differentiate blocks of the same kind that generate the same event. This path can also be used with the *-\\-trace* option to reduce the number of events.
 
 The third part, which is also a string, is the information dumped by the event, and is totally specific to this event. In our example, the core simulator is just printing information about the instruction that has been executed.
+
+Trace path
+..........
 
 One difficulty is usually to find out which paths should be activated to get the needed information. One method is to dump all the events with *-\\-trace=.**, then find out which one are interesting and then put them on the command line. Here are the paths for the main components (note that this can differ from one chip to another):
 
@@ -103,7 +109,10 @@ Path                                      Description
 
 At first, the most interesting traces are the core instruction traces. As they show not only the instructions executed but also the registers accessed, their content and the memory accesses, they are very useful for debugging bugs like memory corruptions.
 
-Here is an example: ::
+Instruction traces
+..................
+
+Here is an example of instruction trace: ::
 
   4890000: 489: [/sys/board/chip/soc/cluster/pe0/insn] M 1c001252 p.sw  0, 4(a5!)  a5=10000010  a5:1000000c  PA:1000000c
 
@@ -129,13 +138,26 @@ The latter information is using the following convention:
 
 The memory accesses which are displayed are particularly interesting for tracking memory corruptions as they can be used to look for accesses to specific locations.
 
+How to dump to a file
+.....................
+
+By default, all traces are dumped to the standard output and it is possible to specify the file where the traces should be dumped. The file must be given for every *--trace* option. The same file can be used, to get all traces into the same file, or different files can be used.
+
+Here is an example to get all possible traces into one file: ::
+
+  make run PLT_OPT=--trace=.*:log.txt
+
+And another example to get instruction traces to one file and L2 memory accesses to another file: ::
+
+  make run PLT_OPT=--trace=insn:insn.txt --trace=l2:l2.txt
+
 
 Debug symbols
 -------------
 
-Some features like instruction traces can use debug symbols to display more information. To activate these features, first compile the binaries in debug mode so that debug symbols are present in the binaries. Then add the option *-\\-debug-syms* to *pulp-run*, like in the following example: ::
+Some features like instruction traces can use debug symbols to display more information. These features are by default enabled and can be disabled with the option *-\\-no-debug-syms*.
 
-  pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --trace=insn --debug-syms"
+To have such features working, the binaries must be compile in debug mode so that debug symbols are present in the binaries and the virtual platform can generate debug symbols information.
 
 The toolchain must be accessible for this option to work, either by making sure it is in accessible through environment variable PATH or by defining this environement variable: ::
 
@@ -145,7 +167,7 @@ Once this works, the instruction trace should look like the following: ::
 
   9398037447: 466538: [/sys/board/chip/soc/fc/insn                         ] _get_next_timeout_expiry:167     M 1c001d7c sw                  ra, 28(sp)         ra:1c002154  sp:1b000db0  PA:1b000dcc
 
-There is a new column which displays the debug information. There are 2 information separated by *:*, the first one is the function which this instruction belongs to, and the second is the line number of the instruction in the source code.
+There is a column which displays the debug information. There are 2 information separated by *:*, the first one is the function which this instruction belongs to, and the second is the line number of the instruction in the source code.
 
 
 VCD traces
@@ -156,19 +178,20 @@ The virtual platform can dump VCD traces which show the state of several compone
 Configuration
 .............
 
-VCD tracing can be activated through the following option: ::
+VCD tracing can be activated through option *-\\-vcd*: ::
 
-  pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --event=.*
+  pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --vcd
 
-Once the platform is run, this will generate a VCD file called *all.vcd* in the build folder. This file a raw file containing all the signals value.
+Once the platform is run, this will generate a VCD file called *all.vcd* in the build folder. This file is a raw file containing all the signals value.
 
 Another file called *view.gtkw* is generated and can be opened using Gtkwave. This is a script file which will setup the view with the most interesting signals. The command to be executed is displayed at the beginning of the simulation when VCD traces are enabled.
 
-The default format is actually the FST gtkwave format, as it is much faster and smaller than VCD. The following option can be used to change the format to VCD: ::
+Trace format
+............
 
-  pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --event=.* --event-format=vcd
+The default format is the FST gtkwave format, as it is much faster and smaller than VCD. However, it is less robust and can make Gtkwave crash. The following option can be used to change the format to VCD: ::
 
-
+  pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --vcd --event-format=vcd
 
 Display
 .......
@@ -183,17 +206,35 @@ It is also possible to open the generated script file mentioned above with this 
 
   gtkwave <script path>
 
+Trace selection
+...............
+
+More traces can be activated by either specifying trace tags or names. Tags will activate a set of traces while names will activate specific traces.
+
+Tags can be activated with the option *-\\-event-tag=<name>*. This option can be given several times to specify several tags. The tag *overview* is always selected, and others can be selected from this list: debug, asm, pc, core_events.
+
+Here is an example: ::
+
+  pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --vcd --event-tag=debug --event-tag=core_events
+
+Specific events can be selected with the option *-\\-event=<name*. This option can be given several times to specify several traces. Like for system traces, the name is a regular expression which will be compared against the path of each trace. Any trace which will match the regular expression will be enabled.
+
+Here is an example to activate all traces: ::
+
+  pulp-run --platform=gvsoc --config=gap_rev1 --binary=test prepare run --vcd --event-tag=debug --event=.*
 
 View description
 ................
 
 The view displayed from the Gtkwave script is made of 2 parts.
 
-The first part, on the top (see the image below), is showing an overview of the execution with the most useful signals like the program counter of each core. This is useful to quickly check what is being executed in the whole system.
+The first part, on the top (see the image below), is showing an overview of the execution with the most useful signals. It basically shows the state of each important block in the system. This is useful to quickly check what is being executed in the whole system.
+
+Some groups of this part are by default closed, and can be opened by double-clicking on them, like the group *stats* which shows the number of instructions per cycle (IPC) for each core. This number is an average and can be slightly shifted with respect to the instructions executed.
 
 .. image:: gtkwave2.png
 
-The second (see the image below), is showing a more detailed view of the execution. The program counter is shown again, with also debug information about the function being executed, the disassembled instructions and so on. For each core, a group called *events* contained information about the state of the core (stalls, loads, instructions, etc). This is useful to understand why a core is being stalled.
+The second (see the image below), is showing a more detailed view of the execution (additional tags or traces must be specified). The program counter is shown, with also debug information about the function being executed, the disassembled instructions and so on. For each core, a group called *events* contained information about the state of the core (stalls, loads, instructions, etc). This is useful to understand why a core is being stalled.
 
 
 .. image:: gtkwave1.png
