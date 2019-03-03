@@ -211,7 +211,7 @@ Trace selection
 
 More traces can be activated by either specifying trace tags or names. Tags will activate a set of traces while names will activate specific traces.
 
-Tags can be activated with the option *-\\-event-tag=<name>*. This option can be given several times to specify several tags. The tag *overview* is always selected, and others can be selected from this list: debug, asm, pc, core_events.
+Tags can be activated with the option *-\\-event-tag=<name>*. This option can be given several times to specify several tags. The tag *overview* is always selected, and others can be selected from this list: debug, asm, pc, core_events, clock.
 
 Here is an example: ::
 
