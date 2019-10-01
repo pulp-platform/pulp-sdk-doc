@@ -39,8 +39,14 @@ Then from another terminal, GDB must be launched and connected: ::
 
 The port specified here must be the same as the one reported earlier.
 
-There are currently a few GDB issues. First it is using by default the 64bit mode if no binary is specified.
-So a binary must always be specified until this is fixed (with option file). Then breakpoints with compressed instructions generate a GDB error. To avoid it, the following gdb property must be set: ::
+There are currently a few GDB issues.
+First it is using by default the 64bit mode if no binary is specified.
+It can be fixed by specifying a binary as a parameter to GDB.
+For other setups, which don't easily allow to specify binary at startup (like Eclipse) it is possible to fix it by setting following property at GDB startup: ::
+
+  $ (gdb) set arch riscv:rv32
+
+Then breakpoints with compressed instructions generate a GDB error. To avoid it, the following gdb property must be set: ::
 
   $ (gdb) set riscv use_compressed_breakpoint off
 
