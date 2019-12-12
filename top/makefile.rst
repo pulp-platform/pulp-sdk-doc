@@ -8,6 +8,7 @@ Although applications can be compiled and run on Pulp platform by hands, by dire
 the tool chain with the appropriate flags, and the platform runner, some generic makefiles are provided in the SDK to simplify this task.
 
 To use these makefiles, the following line must be included in the application makefile, which will give access to the SDK targets, flags and options documented afterwards: ::
+
   include $(PULP_SDK_HOME)/install/rules/pulp_rt.mk
 
 Getting help
@@ -100,7 +101,7 @@ In order to keep the previous configuration and just extend it, just put back th
 
 
 Application reconfiguration
----------------
+---------------------------
 
 The configuration used for compiling and running the application is selected when the SDK is initialized, depending on the script which is sourced.
 
